@@ -24,7 +24,7 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>5.0.0</version>
+            <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -52,6 +52,7 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>mvc-productos/src/main/java</sourceDirectory>
         <finalName>mvc-productos</finalName>
 
         <plugins>
@@ -73,6 +74,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.2</version>
                 <configuration>
+                    <warSourceDirectory>mvc-productos/src/main/webapp</warSourceDirectory>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>

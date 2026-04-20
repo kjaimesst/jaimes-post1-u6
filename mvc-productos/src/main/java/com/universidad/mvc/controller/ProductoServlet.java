@@ -1,4 +1,3 @@
-
 package com.universidad.mvc.controller;
 
 import com.universidad.mvc.model.Producto;
@@ -6,7 +5,9 @@ import com.universidad.mvc.service.ProductoService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
@@ -21,23 +22,29 @@ public class ProductoServlet extends HttpServlet {
 
         String accion = req.getParameter("accion");
 
-        if (accion == null) accion = "listar";
+        if (accion == null || accion.isBlank()) {
+            accion = "listar";
+        }
 
         switch (accion) {
             case "listar":
                 listar(req, resp);
                 break;
+
             case "formulario":
-                formulario(req, resp);
+                mostrarFormulario(req, resp);
                 break;
+
             case "editar":
-                editar(req, resp);
+                mostrarEdicion(req, resp);
                 break;
+
             case "eliminar":
                 eliminar(req, resp);
                 break;
+
             default:
-                resp.sendError(404);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
@@ -49,10 +56,18 @@ public class ProductoServlet extends HttpServlet {
 
         String accion = req.getParameter("accion");
 
-        if ("guardar".equals(accion)) guardar(req, resp);
-        else if ("actualizar".equals(accion)) actualizar(req, resp);
-        else resp.sendError(400);
+        if ("guardar".equals(accion)) {
+            guardar(req, resp);
+        } else if ("actualizar".equals(accion)) {
+            actualizar(req, resp);
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
     }
+
+    // =========================
+    // GET
+    // =========================
 
     private void listar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -61,25 +76,33 @@ public class ProductoServlet extends HttpServlet {
         forward(req, resp, "/WEB-INF/views/lista.jsp");
     }
 
-    private void formulario(HttpServletRequest req, HttpServletResponse resp)
+    private void mostrarFormulario(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         forward(req, resp, "/WEB-INF/views/formulario.jsp");
     }
 
-    private void editar(HttpServletRequest req, HttpServletResponse resp)
+    private void mostrarEdicion(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         int id = Integer.parseInt(req.getParameter("id"));
-        req.setAttribute("producto", service.obtenerPorId(id));
+
+        Producto producto = service.obtenerPorId(id);
+
+        req.setAttribute("producto", producto);
 
         forward(req, resp, "/WEB-INF/views/formulario.jsp");
     }
+
+    // =========================
+    // POST
+    // =========================
 
     private void guardar(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
 
         Producto p = extraer(req, 0);
+
         service.guardar(p);
 
         resp.sendRedirect(req.getContextPath() + "/productos");
@@ -89,6 +112,7 @@ public class ProductoServlet extends HttpServlet {
             throws IOException {
 
         int id = Integer.parseInt(req.getParameter("id"));
+
         Producto p = extraer(req, id);
 
         service.actualizar(p);
@@ -100,10 +124,15 @@ public class ProductoServlet extends HttpServlet {
             throws IOException {
 
         int id = Integer.parseInt(req.getParameter("id"));
+
         service.eliminar(id);
 
         resp.sendRedirect(req.getContextPath() + "/productos");
     }
+
+    // =========================
+    // UTIL
+    // =========================
 
     private Producto extraer(HttpServletRequest req, int id) {
 
