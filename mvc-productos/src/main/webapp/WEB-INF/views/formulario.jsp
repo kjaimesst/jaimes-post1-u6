@@ -41,7 +41,7 @@
            value="${producto.nombre != null ? producto.nombre : ''}">
     <br>
 
-    <label>Categoría:</label>
+    <label>Categoria:</label>
     <input type="text" name="categoria"
            value="${producto.categoria != null ? producto.categoria : ''}">
     <br>
